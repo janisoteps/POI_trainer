@@ -6,15 +6,25 @@ data_file_output = jsonlines.open('data/img_data/img_items_topshop_run6_10_roi.j
 line_nr = 0
 mouse_x = None
 mouse_y = None
+can_write = False
 
 
 def on_click(event, x, y, p1, p2):
     global mouse_x
     global mouse_y
+    global can_write
     if event == cv2.EVENT_LBUTTONDOWN:
         print(x, y)
         mouse_x = x
         mouse_y = y
+        can_write = True
+
+
+def write_data(data):
+    global can_write
+    if can_write == True:
+        data_file_output.write(data)
+        can_write = False
 
 
 for line in data_file_input:
@@ -32,6 +42,7 @@ for line in data_file_input:
     print(img.shape)
     img_h = img.shape[0]
     img_w = img.shape[1]
+    cv2.putText(img, line['name'], (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 234, 2)
     cv2.imshow("image", img)
     cv2.namedWindow('image')
     cv2.setMouseCallback('image', on_click)
@@ -55,6 +66,7 @@ for line in data_file_input:
     print(poi_data)
     output_line = line
     output_line['poi_data'] = poi_data
+    write_data(output_line)
     line_nr += 1
     print(f'LINE: {line_nr}')
     print('-----------------------------------------------------')
